@@ -6,6 +6,7 @@ import com.colombia.eps.holidays.domain.spi.IHolidaysPersistencePort;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public class HolidayUseCase implements IHolidaysServicePort {
     private final IHolidaysPersistencePort holidaysPersistencePort;
@@ -19,7 +20,7 @@ public class HolidayUseCase implements IHolidaysServicePort {
      * @return list of holidays
      */
     @Override
-    public List<String> getHolidays(String city) {
+    public Map<String,List<LocalDate>> getHolidays(List<String> city) {
         return holidaysPersistencePort.getHolidays(city);
     }
 

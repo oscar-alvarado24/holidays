@@ -12,14 +12,12 @@ import com.colombia.eps.holidays.infrastructure.output.dynamo.mapper.IDynamoMapp
 import com.colombia.eps.holidays.infrastructure.output.dynamo.repository.DynamoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -30,20 +28,26 @@ public class DynamoAdapter implements IHolidaysPersistencePort {
     private final IDynamoMapper dynamoMapper;
 
     /**
-     * @param city where the doctor works
+     * @param cities where the doctor works
      * @return list of holidays
      */
     @Override
-    public List<String> getHolidays(String city) {
+    public Map<String,List<LocalDate>> getHolidays(List<String> cities) {
         try (DynamoDbManager manager = new DynamoDbManager()) {
             DynamoDbTable<Holidays> table = manager.createTable();
-            List<Holidays> holidaysList = new ArrayList<>(dynamoRepository.getItemByIndex(Constants.ORDER_INDEX, Constants.NATIONAL, table));
-            holidaysList.addAll(dynamoRepository.getItemByIndex(Constants.CITY_INDEX, city, table));
-
-
-            return holidaysList.stream()
-                    .map(Holidays::getDate)
-                    .collect(Collectors.toList());
+            List<LocalDate> nationalHolidaysList = new ArrayList<>(dynamoMapper.toLocalDateList(dynamoRepository.getHolidaysByIndex(Constants.ORDER_INDEX, Constants.NATIONAL, table)));
+            return cities.stream()
+                    .collect(Collectors.toMap(
+                            city -> city,  // La ciudad es la clave
+                            city -> {
+                                // Obtener la lista de festivos por ciudad
+                                List<Holidays> cityHolidays = dynamoRepository.getHolidaysByIndex(Constants.CITY_INDEX,city, table);
+                                List<LocalDate> dateCityHolidays = dynamoMapper.toLocalDateList(cityHolidays);
+                                // Combinar la lista de festivos por ciudad con los festivos nacionales
+                                dateCityHolidays.addAll(nationalHolidaysList);
+                                return dateCityHolidays;
+                            }
+                    ));
         } catch (Exception exception) {
             log.error(exception.getMessage());
             throw new DontGetHolidaysException();

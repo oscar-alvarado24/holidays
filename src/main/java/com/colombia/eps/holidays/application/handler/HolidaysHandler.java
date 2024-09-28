@@ -8,6 +8,8 @@ import com.colombia.eps.holidays.domain.api.IHolidaysServicePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class HolidaysHandler implements IHolidaysHandler {
@@ -20,7 +22,7 @@ public class HolidaysHandler implements IHolidaysHandler {
      * @return list of holidays
      */
     @Override
-    public DatesResponse getHolidays(String city) {
+    public List<DatesResponse> getHolidays(List<String> city) {
         return holidaysMapper.toDatesResponse(holidaysServicePort.getHolidays(city));
     }
 

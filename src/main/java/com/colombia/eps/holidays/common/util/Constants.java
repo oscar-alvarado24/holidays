@@ -17,4 +17,5 @@ public final class Constants {
     public static final String COUNTRY = "CO";
     public static final String YEAR = "2024";
     public static final String DYNAMO_ROL = "DYNAMO_ROL";
+    public static final String SPACE = " ";
 }

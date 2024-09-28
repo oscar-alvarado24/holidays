@@ -8,7 +8,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/holidays")
@@ -22,8 +29,8 @@ public class HolidaysController {
             @ApiResponse(responseCode = "200", description = "Get holidays successfully", content = @Content),
             @ApiResponse(responseCode = "500", description = "Fail process for get holidays", content = @Content)
     })
-    @GetMapping("/holidays/{city}")
-    public DatesResponse getHolidays(@PathVariable(name = "city") String city){
+    @GetMapping("/get-holidays")
+    public List<DatesResponse> getHolidays(@RequestParam(name = "city") List<String> city){
         return holidaysHandler.getHolidays(city);
     }
 

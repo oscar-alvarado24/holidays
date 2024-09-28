@@ -4,12 +4,11 @@ import com.colombia.eps.holidays.common.util.Constants;
 import com.colombia.eps.holidays.infrastructure.exception.DontSaveHolidateListException;
 import com.colombia.eps.holidays.infrastructure.output.dynamo.entity.Holidays;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 import software.amazon.awssdk.enhanced.dynamodb.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.*;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DynamoRepository {
 
-    public List<Holidays> getItemByIndex(String index, String valueSearch, DynamoDbTable<Holidays> table){
+    public List<Holidays> getHolidaysByIndex(String index, String valueSearch, DynamoDbTable<Holidays> table){
         DynamoDbIndex<Holidays> dbIndex = table.index(index);
 
         // Perform the query for the attribute
@@ -28,9 +27,11 @@ public class DynamoRepository {
 
         SdkIterable<Page<Holidays>> queryResult = dbIndex.query(r -> r.queryConditional(queryConditionalA));
         return queryResult.stream()
+                .parallel()
                 .flatMap(page -> page.items().stream())
                 .collect(Collectors.toList());
     }
+
 
     public String saveHolidays(List<Holidays> holidays,DynamoDbEnhancedClient enhancedClient, DynamoDbTable<Holidays> table){
         try {

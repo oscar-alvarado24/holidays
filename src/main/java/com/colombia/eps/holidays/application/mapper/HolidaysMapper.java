@@ -8,7 +8,9 @@ import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
@@ -16,8 +18,12 @@ import java.util.List;
 public interface HolidaysMapper {
 
     HolidaysMapper INSTANCE = Mappers.getMapper(HolidaysMapper.class);
-    default DatesResponse toDatesResponse(List<String> holidaysList){
-        return new DatesResponse(holidaysList);
+    default List<DatesResponse> toDatesResponse(Map<String,List<LocalDate>>holidays){
+        List<DatesResponse> datesResponses = new ArrayList<>();
+        holidays.forEach((k,v)->{
+            datesResponses.add(new DatesResponse(k,v));
+        });
+        return datesResponses;
     }
 
     HolidayModel toHolidayModel(HolidayRequest holidayRequest);
