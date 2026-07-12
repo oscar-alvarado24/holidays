@@ -29,7 +29,7 @@ public class DynamoRepository {
         return queryResult.stream()
                 .parallel()
                 .flatMap(page -> page.items().stream())
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
